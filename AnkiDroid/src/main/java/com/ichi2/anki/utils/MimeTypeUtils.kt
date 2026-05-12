@@ -25,4 +25,9 @@ object MimeTypeUtils {
             "text/tsv",
             "text/plain",
         )
+
+    val HTML_MIME_TYPES =
+        arrayOf(
+            "text/html",
+        )
 }

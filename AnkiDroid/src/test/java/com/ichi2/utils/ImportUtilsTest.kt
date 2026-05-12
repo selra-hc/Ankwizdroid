@@ -134,7 +134,6 @@ class ImportUtilsTest : RobolectricTest() {
         val invalidMimeTypes =
             listOf(
                 null,
-                "text/html",
                 "application/pdf",
                 "image/jpeg",
                 "image/png",
@@ -151,6 +150,11 @@ class ImportUtilsTest : RobolectricTest() {
             val isValid = ImportUtils.isValidTextOrDataFile(context, uri)
             assertFalse("Expected MIME to be rejected: $mime", isValid)
         }
+
+        val htmlMimeType = "text/html"
+        val htmlContext = mockContextWithMime(htmlMimeType)
+        assertFalse("text/html should not be accepted by isValidTextOrDataFile", ImportUtils.isValidTextOrDataFile(htmlContext, uri))
+        assertTrue("text/html should be accepted by isValidHtmlFile", ImportUtils.isValidHtmlFile(htmlContext, uri))
     }
 
     private fun mockContextWithMime(mimeType: String?): Context {

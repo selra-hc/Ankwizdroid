@@ -229,13 +229,21 @@ class Notetypes(
         )
 
     fun newMultipleChoiceNotetype(): NotetypeJson {
-        val nt = new("Multiple Choice")
-        val fieldNames = listOf(
-            "Question",
-            "Answer1", "Answer2", "Answer3", "Answer4",
-            "Justification1", "Justification2", "Justification3", "Justification4",
-            "CorrectIndex",
-        )
+        val nt = new("Multiple Choice v3")
+        val fieldNames =
+            listOf(
+                "QuestionNumber",
+                "Question",
+                "AnswerA",
+                "AnswerB",
+                "AnswerC",
+                "AnswerD",
+                "JustificationA",
+                "JustificationB",
+                "JustificationC",
+                "JustificationD",
+                "CorrectAnswer",
+            )
         for (name in fieldNames) {
             nt.fields.append(newField(name))
         }
@@ -243,70 +251,39 @@ class Notetypes(
 
         val template = Notetypes.newTemplate("Card 1")
 
-        template.qfmt = """
-            <div class="mc-question">{{Question}}</div>
-            <div id="mc-options" data-correct="{{CorrectIndex}}">
-                <div class="mc-option" data-idx="1" onclick="ankidroid.mcSelect(1)">{{Answer1}}</div>
-                <div class="mc-option" data-idx="2" onclick="ankidroid.mcSelect(2)">{{Answer2}}</div>
-                <div class="mc-option" data-idx="3" onclick="ankidroid.mcSelect(3)">{{Answer3}}</div>
-                <div class="mc-option" data-idx="4" onclick="ankidroid.mcSelect(4)">{{Answer4}}</div>
-            </div>
-            <div id="mc-justifications" style="display:none">
-                <span class="mc-just" data-idx="1">{{Justification1}}</span>
-                <span class="mc-just" data-idx="2">{{Justification2}}</span>
-                <span class="mc-just" data-idx="3">{{Justification3}}</span>
-                <span class="mc-just" data-idx="4">{{Justification4}}</span>
-            </div>
-        """.trimIndent()
+        template.qfmt =
+            "<div class=\"mc-question-row\">" +
+            "<span class=\"mc-qnum\">{{QuestionNumber}}</span> | " +
+            "<span class=\"mc-question\">{{Question}}</span></div>\n" +
+            "<div id=\"mc-options\">\n" +
+            "<div class=\"mc-option\" data-idx=\"A\" " +
+            "onclick=\"window.location.href='ankidroid://mc-select/A'\">{{AnswerA}}</div>\n" +
+            "<div class=\"mc-option\" data-idx=\"B\" " +
+            "onclick=\"window.location.href='ankidroid://mc-select/B'\">{{AnswerB}}</div>\n" +
+            "<div class=\"mc-option\" data-idx=\"C\" " +
+            "onclick=\"window.location.href='ankidroid://mc-select/C'\">{{AnswerC}}</div>\n" +
+            "<div class=\"mc-option\" data-idx=\"D\" " +
+            "onclick=\"window.location.href='ankidroid://mc-select/D'\">{{AnswerD}}</div>\n" +
+            "</div>\n"
 
-        template.afmt = """
-            {{FrontSide}}
-            <hr id="answer">
-            <div id="mc-feedback"></div>
-            <script>
-            (function() {
-                var sel = window._mcSelection;
-                var correct = document.getElementById('mc-options').getAttribute('data-correct');
-                var fb = document.getElementById('mc-feedback');
-                var options = document.querySelectorAll('.mc-option');
-                var justs = document.querySelectorAll('.mc-just');
-                function getJust(idx) {
-                    for (var i = 0; i < justs.length; i++) {
-                        if (justs[i].getAttribute('data-idx') == idx) return justs[i].innerHTML;
-                    }
-                    return '';
-                }
-                if (sel == correct) {
-                    fb.innerHTML = '<div class="mc-correct">&#10004; Great!</div><div class="mc-just-correct">' + getJust(correct) + '</div>';
-                } else {
-                    fb.innerHTML = '<div class="mc-wrong">&#10008; Wrong answer</div>'
-                        + '<div class="mc-correct-answer"><b>Correct answer:</b> ' + options[correct - 1].innerHTML + '<div class="mc-just-correct">' + getJust(correct) + '</div></div>'
-                        + '<div class="mc-your-answer"><b>Your answer:</b> ' + options[sel - 1].innerHTML + '<div class="mc-just-wrong">' + getJust(sel) + '</div></div>';
-                }
-            })();
-            </script>
-        """.trimIndent()
+        template.afmt = "{{FrontSide}}\n<hr id=\"answer\">\n<div id=\"mc-feedback\"></div>"
 
-        nt.css = """
-            .mc-question { font-size: 1.2em; margin-bottom: 16px; font-weight: bold; }
-            .mc-option {
-                padding: 12px 16px; margin: 6px 0; border: 2px solid #ccc; border-radius: 8px;
-                cursor: pointer; background: #f9f9f9; transition: background 0.2s, border-color 0.2s;
-            }
-            .mc-option:hover { background: #e8e8e8; border-color: #999; }
-            .mc-option.selected { background: #d0e8ff; border-color: #4a90d9; }
-            .mc-correct { color: #2e7d32; font-size: 1.2em; font-weight: bold; margin-bottom: 8px; }
-            .mc-wrong { color: #c62828; font-size: 1.2em; font-weight: bold; margin-bottom: 8px; }
-            .mc-correct-answer { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 8px 12px; margin: 8px 0; border-radius: 4px; }
-            .mc-your-answer { background: #ffebee; border-left: 4px solid #c62828; padding: 8px 12px; margin: 8px 0; border-radius: 4px; }
-            .mc-just-correct { margin-top: 4px; font-style: italic; color: #388e3c; }
-            .mc-just-wrong { margin-top: 4px; font-style: italic; color: #d32f2f; }
-            .night_mode .mc-option { background: #333; border-color: #555; color: #ddd; }
-            .night_mode .mc-option:hover { background: #444; border-color: #777; }
-            .night_mode .mc-option.selected { background: #1a3a5c; border-color: #4a90d9; }
-            .night_mode .mc-correct-answer { background: #1b3a1b; }
-            .night_mode .mc-your-answer { background: #3a1b1b; }
-        """.trimIndent()
+        nt.css =
+            ".mc-question { font-size: 1.2em; margin-bottom: 16px; font-weight: bold; }\n" +
+            ".mc-option { padding: 12px 16px; margin: 6px 0; border: 2px solid #ccc; " +
+            "border-radius: 8px; background: #f9f9f9; cursor: pointer; " +
+            "transition: background 0.2s, border-color 0.2s; }\n" +
+            ".mc-option:hover { background: #e8e8e8; border-color: #999; }\n" +
+            ".mc-correct { color: #2e7d32; font-size: 1.2em; font-weight: bold; " +
+            "margin-bottom: 8px; }\n" +
+            ".mc-wrong { color: #c62828; font-size: 1.2em; font-weight: bold; " +
+            "margin-bottom: 8px; }\n" +
+            ".mc-correct-answer { background: #e8f5e9; border-left: 4px solid #2e7d32; " +
+            "padding: 8px 12px; margin: 8px 0; border-radius: 4px; }\n" +
+            ".mc-your-answer { background: #ffebee; border-left: 4px solid #c62828; " +
+            "padding: 8px 12px; margin: 8px 0; border-radius: 4px; }\n" +
+            ".mc-just-correct { margin-top: 4px; font-style: italic; color: #388e3c; }\n" +
+            ".mc-just-wrong { margin-top: 4px; font-style: italic; color: #d32f2f; }"
 
         add_template(nt, template)
         return nt
@@ -893,8 +870,7 @@ fun getStockNotetypeKinds(): List<StockNotetype.Kind> = StockNotetype.Kind.entri
 
 @NotInPyLib
 fun Collection.ensureMultipleChoiceNotetype(): NoteTypeId? {
-    val existing = notetypes.byName("Multiple Choice")
-    if (existing != null) return existing.id
+    notetypes.byName("Multiple Choice v3")?.let { return it.id }
     val nt = notetypes.newMultipleChoiceNotetype()
     notetypes.add(nt)
     return nt.id

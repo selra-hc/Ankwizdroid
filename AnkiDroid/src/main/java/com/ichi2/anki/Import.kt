@@ -18,20 +18,27 @@ package com.ichi2.anki
 
 import android.app.Activity
 import android.content.Intent
+import android.widget.Toast
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
+import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.common.annotations.NeedsTest
+import com.ichi2.anki.common.coroutines.applicationScope
 import com.ichi2.anki.dialogs.AsyncDialogFragment
 import com.ichi2.anki.dialogs.ImportDialog
 import com.ichi2.anki.dialogs.ImportFileSelectionFragment
 import com.ichi2.anki.dialogs.ImportFileSelectionFragment.ImportOptions
 import com.ichi2.anki.pages.CsvImporter
+import com.ichi2.anki.pages.HtmlQuestionnaireParser
 import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.anki.utils.ext.dismissAllDialogFragments
 import com.ichi2.anki.utils.ext.showDialogFragment
 import com.ichi2.utils.ImportResult
 import com.ichi2.utils.ImportUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 
@@ -76,6 +83,44 @@ fun Activity.onSelectedCsvForImport(data: Intent) {
     stackBuilder.startActivities()
 }
 
+fun AnkiActivity.onSelectedHtmlForImport(data: Intent) {
+    val path = ImportUtils.getFileCachedCopy(this, data) ?: return
+    applicationScope.launch {
+        try {
+            val html = withContext(Dispatchers.IO) { File(path).readText() }
+            val questions = HtmlQuestionnaireParser.parse(html)
+            if (questions.isEmpty()) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@onSelectedHtmlForImport, R.string.import_html_no_questions, Toast.LENGTH_LONG).show()
+                }
+                return@launch
+            }
+            val deckId = withCol { decks.selected() }
+            val total = questions.size
+            val imported = HtmlQuestionnaireParser.importQuestions(questions, deckId)
+            withContext(Dispatchers.Main) {
+                val msg =
+                    if (imported == total) {
+                        getString(R.string.import_html_success, imported)
+                    } else {
+                        getString(R.string.import_html_partial, imported, total)
+                    }
+                Toast.makeText(this@onSelectedHtmlForImport, msg, Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            Timber.w(e, "HTML import failed")
+            withContext(Dispatchers.Main) {
+                Toast
+                    .makeText(
+                        this@onSelectedHtmlForImport,
+                        getString(R.string.import_html_error, e.message ?: e.javaClass.simpleName),
+                        Toast.LENGTH_LONG,
+                    ).show()
+            }
+        }
+    }
+}
+
 fun AnkiActivity.showImportDialog(
     id: ImportDialog.Type,
     importPath: String,
@@ -91,6 +136,7 @@ fun AnkiActivity.showImportDialog() {
             importApkg = true,
             importColpkg = true,
             importTextFile = true,
+            importHtmlFile = true,
         ),
     )
 }

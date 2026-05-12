@@ -205,6 +205,11 @@
     <string name="import_deck_package">Deck package (.apkg)</string>
     <string name="import_collection_package">Collection package (.colpkg)</string>
     <string name="import_csv">Text file (.txt, .csv)</string>
+    <string name="import_html">HTML questionnaire (.html)</string>
+    <string name="import_html_no_questions">No multiple choice questions found in the HTML file</string>
+    <string name="import_html_success">%d questions imported successfully</string>
+    <string name="import_html_partial">%1$d / %2$d questions imported (some failed)</string>
+    <string name="import_html_error">Failed to import HTML questionnaire: %s</string>
 
     <!-- scoped storage -->
     <string name="backup_your_collection">Backup your collection</string>

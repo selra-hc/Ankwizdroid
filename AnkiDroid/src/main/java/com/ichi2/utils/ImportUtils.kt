@@ -40,6 +40,7 @@ import com.ichi2.anki.dialogs.DialogHandler
 import com.ichi2.anki.dialogs.DialogHandlerMessage
 import com.ichi2.anki.dialogs.ImportDialog
 import com.ichi2.anki.onSelectedCsvForImport
+import com.ichi2.anki.onSelectedHtmlForImport
 import com.ichi2.anki.servicelayer.DebugInfoService
 import com.ichi2.anki.showImportDialog
 import kotlinx.coroutines.launch
@@ -117,6 +118,14 @@ object ImportUtils {
                 "text/csv",
                 "text/tsv",
             )
+    }
+
+    fun isValidHtmlFile(
+        context: Context,
+        uri: Uri,
+    ): Boolean {
+        val mimeType = context.contentResolver.getType(uri)
+        return mimeType == "text/html"
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -223,6 +232,9 @@ object ImportUtils {
             if (isValidTextOrDataFile(context, importPathUri)) {
                 (context as Activity).onSelectedCsvForImport(intent!!)
                 return ImportResult.Success
+            } else if (isValidHtmlFile(context, importPathUri)) {
+                (context as AnkiActivity).onSelectedHtmlForImport(intent!!)
+                return ImportResult.Success
             } else if (!isValidPackageName(filename)) {
                 return if (isAnkiDatabase(filename)) {
                     // .anki2 files aren't supported by Anki Desktop, we should eventually support them, because we can
@@ -259,6 +271,7 @@ object ImportUtils {
                 isDeckPackage(fileName) -> true
                 isCollectionPackage(fileName) -> true
                 isValidTextOrDataFile(context, importPathUri) -> true
+                isValidHtmlFile(context, importPathUri) -> true
                 else -> false
             }
         }

@@ -129,6 +129,7 @@ import com.ichi2.anki.dialogs.FatalErrorDialog
 import com.ichi2.anki.dialogs.ImportDialog.ImportDialogListener
 import com.ichi2.anki.dialogs.ImportFileSelectionFragment.ApkgImportResultLauncherProvider
 import com.ichi2.anki.dialogs.ImportFileSelectionFragment.CsvImportResultLauncherProvider
+import com.ichi2.anki.dialogs.ImportFileSelectionFragment.HtmlImportResultLauncherProvider
 import com.ichi2.anki.dialogs.SchedulerUpgradeDialog
 import com.ichi2.anki.dialogs.SyncErrorDialog
 import com.ichi2.anki.dialogs.SyncErrorDialog.Companion.newInstance
@@ -244,6 +245,7 @@ open class DeckPicker :
     BaseSnackbarBuilderProvider,
     ApkgImportResultLauncherProvider,
     CsvImportResultLauncherProvider,
+    HtmlImportResultLauncherProvider,
     CollectionPermissionScreenLauncher {
     val viewModel: DeckPickerViewModel by viewModels()
 
@@ -371,6 +373,16 @@ open class DeckPicker :
             DeckPickerActivityResultCallback {
                 if (it.resultCode == RESULT_OK) {
                     onSelectedCsvForImport(it.data!!)
+                }
+            },
+        )
+
+    private val htmlImportResultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            DeckPickerActivityResultCallback {
+                if (it.resultCode == RESULT_OK) {
+                    onSelectedHtmlForImport(it.data!!)
                 }
             },
         )
@@ -2238,6 +2250,8 @@ open class DeckPicker :
     override fun getApkgFileImportResultLauncher(): ActivityResultLauncher<Intent> = apkgFileImportResultLauncher
 
     override fun getCsvFileImportResultLauncher(): ActivityResultLauncher<Intent> = csvImportResultLauncher
+
+    override fun getHtmlFileImportResultLauncher(): ActivityResultLauncher<Intent> = htmlImportResultLauncher
 }
 
 /** Android's onCreateOptionsMenu does not play well with coroutines, as

@@ -75,11 +75,11 @@ class ImportFileSelectionFragmentTest : RobolectricTest() {
     }
 
     @Test
-    fun `dialog with all import options shows three entries`() {
+    fun `dialog with all import options shows four entries`() {
         showDialog(
-            ImportOptions(importColpkg = true, importApkg = true, importTextFile = true),
+            ImportOptions(importColpkg = true, importApkg = true, importTextFile = true, importHtmlFile = true),
         ) { dialog ->
-            assertThat(dialog.listView.count, equalTo(3))
+            assertThat(dialog.listView.count, equalTo(4))
             assertThat(
                 dialog.listView.itemLabels(),
                 equalTo(
@@ -87,6 +87,7 @@ class ImportFileSelectionFragmentTest : RobolectricTest() {
                         targetContext.getString(R.string.import_deck_package),
                         importCollectionPackageLabel,
                         importCsvLabel,
+                        importHtmlLabel,
                     ),
                 ),
             )
@@ -149,6 +150,8 @@ class ImportFileSelectionFragmentTest : RobolectricTest() {
     private val importCollectionPackageLabel = targetContext.getString(R.string.import_collection_package)
 
     private val importCsvLabel = targetContext.getString(R.string.import_csv)
+
+    private val importHtmlLabel = targetContext.getString(R.string.import_html)
 
     private fun ListView.itemLabels(): List<String> = (0 until adapter.count).map { adapter.getItem(it).toString() }
 }

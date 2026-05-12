@@ -101,6 +101,18 @@ class ImportFileSelectionFragment : DialogFragment() {
                         ),
                     )
                 }
+                if (options.importHtmlFile) {
+                    add(
+                        ImportEntry(
+                            R.string.import_html,
+                            AnalyticsConstants.Actions.IMPORT_CSV_FILE,
+                            ImportFileType.HTML,
+                            multiple = false,
+                            mimeType = "text/html",
+                            extraMimes = MimeTypeUtils.HTML_MIME_TYPES,
+                        ),
+                    )
+                }
             }
         } ?: emptyList()
     }
@@ -119,12 +131,14 @@ class ImportFileSelectionFragment : DialogFragment() {
         val importColpkg: Boolean,
         val importApkg: Boolean,
         val importTextFile: Boolean,
+        val importHtmlFile: Boolean = false,
     ) : Parcelable
 
     enum class ImportFileType {
         APKG,
         COLPKG,
         CSV,
+        HTML,
     }
 
     interface ApkgImportResultLauncherProvider {
@@ -133,6 +147,10 @@ class ImportFileSelectionFragment : DialogFragment() {
 
     interface CsvImportResultLauncherProvider {
         fun getCsvFileImportResultLauncher(): ActivityResultLauncher<Intent>
+    }
+
+    interface HtmlImportResultLauncherProvider {
+        fun getHtmlFileImportResultLauncher(): ActivityResultLauncher<Intent>
     }
 
     companion object {
@@ -183,6 +201,8 @@ class ImportFileSelectionFragment : DialogFragment() {
                     activity.getApkgFileImportResultLauncher().launch(intent)
                 } else if (fileType == ImportFileType.CSV && activity is CsvImportResultLauncherProvider) {
                     activity.getCsvFileImportResultLauncher().launch(intent)
+                } else if (fileType == ImportFileType.HTML && activity is HtmlImportResultLauncherProvider) {
+                    activity.getHtmlFileImportResultLauncher().launch(intent)
                 } else {
                     Timber.w("Activity($activity) can't handle requested import: $fileType")
                 }
