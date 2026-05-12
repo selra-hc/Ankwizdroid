@@ -35,6 +35,12 @@ proguard/
 # Windows clutter
 Thumbs.db
 
+# WSL/NTFS Alternate Data Stream artifacts
+*:Zone.Identifier
+
+# Local sample assets (not tracked; keep upstream-friendly clones)
+samples/
+
 # Ubunut gedit cluter
 *~
 
