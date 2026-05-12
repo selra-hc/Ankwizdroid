@@ -20,10 +20,13 @@ import android.os.Parcelable
 import androidx.annotation.CheckResult
 import androidx.core.os.BundleCompat
 import androidx.lifecycle.SavedStateHandle
+import com.ichi2.anki.AnkiDroidApp
 import com.ichi2.anki.CollectionManager
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.NotetypeFile
+import com.ichi2.anki.R
 import com.ichi2.anki.asyncIO
+import com.ichi2.anki.cardviewer.MultipleChoiceFeedback
 import com.ichi2.anki.launchCatchingIO
 import com.ichi2.anki.libanki.Card
 import com.ichi2.anki.libanki.CardOrdinal
@@ -249,6 +252,21 @@ class TemplatePreviewerViewModel(
     /* *********************************************************************************************
      *************************************** Internal methods ***************************************
      ********************************************************************************************* */
+
+    private val mcFeedbackStrings by lazy {
+        MultipleChoiceFeedback.Strings(
+            right = AnkiDroidApp.instance.getString(R.string.mc_feedback_right),
+            wrong = AnkiDroidApp.instance.getString(R.string.mc_feedback_wrong),
+            noAnswer = AnkiDroidApp.instance.getString(R.string.mc_feedback_no_answer),
+            correctAnswerLabel = AnkiDroidApp.instance.getString(R.string.mc_feedback_correct_answer_label),
+            yourAnswerLabel = AnkiDroidApp.instance.getString(R.string.mc_feedback_your_answer_label),
+        )
+    }
+
+    override suspend fun prepareAnswerHtml(html: String): String {
+        val card = currentCard.await()
+        return withCol { MultipleChoiceFeedback.injectForCard(this, card, html, null, mcFeedbackStrings) }
+    }
 
     private suspend fun loadAndPlaySounds(side: CardSide) {
         cardMediaPlayer.loadCardAvTags(currentCard.await())

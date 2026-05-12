@@ -204,6 +204,7 @@ class ReviewerViewModel(
     }
 
     fun onMultipleChoiceSelected(letter: String) {
+        if (showingAnswer.value) return
         val upper = letter.uppercase()
         if (upper !in setOf("A", "B", "C", "D")) return
         savedStateHandle[KEY_MC_SELECTED_LETTER] = upper

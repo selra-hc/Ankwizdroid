@@ -18,10 +18,13 @@ package com.ichi2.anki.previewer
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import anki.collection.OpChanges
+import com.ichi2.anki.AnkiDroidApp
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.Flag
+import com.ichi2.anki.R
 import com.ichi2.anki.asyncIO
 import com.ichi2.anki.browser.IdsFile
+import com.ichi2.anki.cardviewer.MultipleChoiceFeedback
 import com.ichi2.anki.cardviewer.SingleCardSide
 import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.launchCatchingIO
@@ -198,6 +201,21 @@ class PreviewerViewModel(
     /* *********************************************************************************************
      *************************************** Internal methods ***************************************
      ********************************************************************************************* */
+
+    private val mcFeedbackStrings by lazy {
+        MultipleChoiceFeedback.Strings(
+            right = AnkiDroidApp.instance.getString(R.string.mc_feedback_right),
+            wrong = AnkiDroidApp.instance.getString(R.string.mc_feedback_wrong),
+            noAnswer = AnkiDroidApp.instance.getString(R.string.mc_feedback_no_answer),
+            correctAnswerLabel = AnkiDroidApp.instance.getString(R.string.mc_feedback_correct_answer_label),
+            yourAnswerLabel = AnkiDroidApp.instance.getString(R.string.mc_feedback_your_answer_label),
+        )
+    }
+
+    override suspend fun prepareAnswerHtml(html: String): String {
+        val card = currentCard.await()
+        return withCol { MultipleChoiceFeedback.injectForCard(this, card, html, null, mcFeedbackStrings) }
+    }
 
     /** Applies [update] to [currentIndex] and re-renders the resulting card. */
     private suspend fun updateCurrentIndex(update: (Int) -> Int) {

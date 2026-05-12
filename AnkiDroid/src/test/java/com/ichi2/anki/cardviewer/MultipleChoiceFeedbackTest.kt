@@ -85,4 +85,37 @@ class MultipleChoiceFeedbackTest {
         assertThat(MultipleChoiceFeedback.containsFeedbackPlaceholder("x<div id=\"mc-feedback\"></div>y"), equalTo(true))
         assertThat(MultipleChoiceFeedback.containsFeedbackPlaceholder("no"), equalTo(false))
     }
+
+    @Test
+    fun `decorateMcOptions strips onclick and highlights correct selection`() {
+        val html =
+            """<div id="mc-options">""" +
+                """<div class="mc-option" data-idx="A" onclick="window.location.href='ankidroid://mc-select/A'">A</div>""" +
+                """<div class="mc-option" data-idx="B" onclick="window.location.href='ankidroid://mc-select/B'">B</div>""" +
+                """</div>"""
+        val out = MultipleChoiceFeedback.decorateMcOptionsInBackHtml(html, "A", "A")
+        assertThat(out, not(containsString("onclick=")))
+        assertThat(out, containsString("mc-option-correct"))
+        assertThat(out, containsString("mc-option-selected-right"))
+        assertThat(out, containsString("""data-idx="A""""))
+    }
+
+    @Test
+    fun `decorateMcOptions marks wrong selection and correct key`() {
+        val html =
+            """<div id="mc-options">""" +
+                """<div class="mc-option" data-idx="A" onclick="x">A</div>""" +
+                """<div class="mc-option" data-idx="B" onclick="y">B</div>""" +
+                """</div>"""
+        val out = MultipleChoiceFeedback.decorateMcOptionsInBackHtml(html, "B", "A")
+        assertThat(out, not(containsString("onclick=")))
+        assertThat(out, containsString("""class="mc-option mc-option-correct""""))
+        assertThat(out, containsString("""class="mc-option mc-option-selected-wrong""""))
+    }
+
+    @Test
+    fun `decorateMcOptions no-op without mc-options container`() {
+        val html = """<div class="mc-option" data-idx="A" onclick="z">A</div>"""
+        assertThat(MultipleChoiceFeedback.decorateMcOptionsInBackHtml(html, "A", "A"), equalTo(html))
+    }
 }

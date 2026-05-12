@@ -274,6 +274,9 @@ class Notetypes(
             "border-radius: 8px; background: #f9f9f9; cursor: pointer; " +
             "transition: background 0.2s, border-color 0.2s; }\n" +
             ".mc-option:hover { background: #e8e8e8; border-color: #999; }\n" +
+            ".mc-option-correct { border-color: #2e7d32; background: #e8f5e9; }\n" +
+            ".mc-option-selected-right { border-color: #2e7d32; background: #c8e6c9; }\n" +
+            ".mc-option-selected-wrong { border-color: #c62828; background: #ffcdd2; }\n" +
             ".mc-correct { color: #2e7d32; font-size: 1.2em; font-weight: bold; " +
             "margin-bottom: 8px; }\n" +
             ".mc-wrong { color: #c62828; font-size: 1.2em; font-weight: bold; " +
