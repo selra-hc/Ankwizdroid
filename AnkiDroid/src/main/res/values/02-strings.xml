@@ -467,6 +467,12 @@ opening the system text to speech settings fails">Failed to open text to speech 
     <!-- Similar to TR.qtMiscNameExists(): "Name exists." -->
     <string name="error_name_exists">Name already exists</string>
 
+    <string comment="Shown on multiple-choice card back when the chosen option is correct" name="mc_feedback_right">Right</string>
+    <string comment="Shown on multiple-choice card back when the chosen option is incorrect" name="mc_feedback_wrong">Wrong</string>
+    <string comment="Shown on multiple-choice card back when the user did not tap an option before revealing" name="mc_feedback_no_answer">No answer selected</string>
+    <string comment="Label before the correct option text on multiple-choice card back" name="mc_feedback_correct_answer_label">Correct answer:</string>
+    <string comment="Label before the option the user chose on multiple-choice card back (wrong case)" name="mc_feedback_your_answer_label">Your answer:</string>
+
     <string comment="Shown when retrying a running action" name="already_in_progress">Already in progress</string>
 </resources>
 

@@ -19,6 +19,7 @@ package com.ichi2.anki.cardviewer
 import android.content.Context
 import androidx.annotation.CheckResult
 import anki.config.ConfigKey
+import com.ichi2.anki.R
 import com.ichi2.anki.libanki.Card
 import com.ichi2.anki.libanki.CardOrdinal
 import com.ichi2.anki.libanki.Collection
@@ -39,6 +40,7 @@ class AndroidCardRenderContext(
     private val cardAppearance: CardAppearance,
     private val cardTemplate: CardTemplate,
     private val showAudioPlayButtons: Boolean,
+    private val mcFeedbackStrings: MultipleChoiceFeedback.Strings?,
 ) {
     /**
      * Renders Android-specific functionality to produce a [RenderedCard]
@@ -48,6 +50,7 @@ class AndroidCardRenderContext(
         col: Collection,
         card: Card,
         side: SingleCardSide,
+        multipleChoiceSelection: String? = null,
     ): RenderedCard {
         // obtain the libAnki-rendered card
         var content: String = if (side == SingleCardSide.FRONT) card.question(col) else card.answer(col)
@@ -61,6 +64,16 @@ class AndroidCardRenderContext(
         content = expandSounds(content, card.renderOutput(col), col)
         // fixes an Android bug where font-weight:600 does not display
         content = CardAppearance.fixBoldStyle(content)
+        if (side == SingleCardSide.BACK && mcFeedbackStrings != null) {
+            content =
+                MultipleChoiceFeedback.injectForCard(
+                    col,
+                    card,
+                    content,
+                    multipleChoiceSelection,
+                    mcFeedbackStrings,
+                )
+        }
 
         // based on the content, load appropriate scripts such as MathJax, then render
         return render(content, card.ord)
@@ -135,11 +148,20 @@ class AndroidCardRenderContext(
             val cardAppearance = CardAppearance.create(ReviewerCustomFonts(), preferences)
             val cardHtmlTemplate = CardTemplate.load(context)
             val showAudioPlayButtons = !col.config.getBool(ConfigKey.Bool.HIDE_AUDIO_PLAY_BUTTONS)
+            val mcStrings =
+                MultipleChoiceFeedback.Strings(
+                    right = context.getString(R.string.mc_feedback_right),
+                    wrong = context.getString(R.string.mc_feedback_wrong),
+                    noAnswer = context.getString(R.string.mc_feedback_no_answer),
+                    correctAnswerLabel = context.getString(R.string.mc_feedback_correct_answer_label),
+                    yourAnswerLabel = context.getString(R.string.mc_feedback_your_answer_label),
+                )
             return AndroidCardRenderContext(
                 typeAnswer,
                 cardAppearance,
                 cardHtmlTemplate,
                 showAudioPlayButtons,
+                mcStrings,
             )
         }
     }

@@ -224,6 +224,10 @@ abstract class AbstractFlashcardViewer :
     /** Generates HTML content  */
     private var cardRenderContext: AndroidCardRenderContext? = null
 
+    /** Letter A–D chosen on a multiple-choice card front (legacy reviewer); cleared when the question is shown. */
+    @VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
+    internal var mcSelectedLetter: String? = null
+
     // Default short animation duration, provided by Android framework
     private var shortAnimDuration = 0
     private var backButtonPressedToReturn = false
@@ -547,6 +551,11 @@ abstract class AbstractFlashcardViewer :
         findViewById<View>(R.id.root_layout).requestFocus()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mcSelectedLetter?.let { outState.putString(BUNDLE_MC_SELECTED_LETTER, it) }
+    }
+
     // ----------------------------------------------------------------------------
     // ANDROID METHODS
     // ----------------------------------------------------------------------------
@@ -554,6 +563,7 @@ abstract class AbstractFlashcardViewer :
         restorePreferences()
         tagsDialogFactory = TagsDialogFactory(this).attachToActivity<TagsDialogFactory>(this)
         super.onCreate(savedInstanceState)
+        mcSelectedLetter = savedInstanceState?.getString(BUNDLE_MC_SELECTED_LETTER)
         lifecycle.addObserver(automaticAnswer)
 
         // Issue 14142: The reviewer had a focus highlight after answering using a keyboard.
@@ -1327,6 +1337,7 @@ abstract class AbstractFlashcardViewer :
 
     open fun displayCardQuestion() {
         Timber.d("displayCardQuestion()")
+        mcSelectedLetter = null
         displayAnswer = false
         backButtonPressedToReturn = false
         setInterface()
@@ -1385,7 +1396,13 @@ abstract class AbstractFlashcardViewer :
             typeAnswer!!.input = answerField!!.text.toString()
         }
         isSelecting = false
-        val answerContent = cardRenderContext!!.renderCard(getColUnsafe, currentCard!!, SingleCardSide.BACK)
+        val answerContent =
+            cardRenderContext!!.renderCard(
+                getColUnsafe,
+                currentCard!!,
+                SingleCardSide.BACK,
+                multipleChoiceSelection = mcSelectedLetter,
+            )
         automaticAnswer.onDisplayAnswer()
         launchCatchingTask {
             if (!automaticAnswerShouldWaitForMedia()) {
@@ -1974,6 +1991,7 @@ abstract class AbstractFlashcardViewer :
             Timber.d("displayCardQuestion()")
             displayAnswer = false
             backButtonPressedToReturn = false
+            mcSelectedLetter = null
             setInterface()
             typeAnswer?.input = ""
             typeAnswer?.updateInfo(getColUnsafe, currentCard!!, resources)
@@ -2490,6 +2508,17 @@ abstract class AbstractFlashcardViewer :
                 return true
             }
 
+            if (url.startsWith("ankidroid://mc-select/", ignoreCase = true)) {
+                val letter = url.substringAfterLast('/').uppercase()
+                if (letter in listOf("A", "B", "C", "D")) {
+                    mcSelectedLetter = letter
+                    if (!displayAnswer) {
+                        displayCardAnswer()
+                    }
+                }
+                return true
+            }
+
             // card.html reload
             if (url.startsWith("signal:reload_card_html")) {
                 redrawCard()
@@ -2738,6 +2767,8 @@ abstract class AbstractFlashcardViewer :
          */
         const val RESULT_DEFAULT = 50
         const val RESULT_NO_MORE_CARDS = 52
+
+        private const val BUNDLE_MC_SELECTED_LETTER = "mcSelectedLetter"
 
         /**
          * Time to wait in milliseconds before resuming fullscreen mode

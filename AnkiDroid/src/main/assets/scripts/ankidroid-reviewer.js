@@ -32,48 +32,6 @@ globalThis.ankidroid.onTypeAnswerKeyDown = function (event) {
 };
 
 // ============================================================================
-// Multiple-choice quiz support
-// ============================================================================
-
-(() => {
-    globalThis.ankidroid.mcSelect = function (idx) {
-        window._mcSelection = idx;
-        const options = document.querySelectorAll(".mc-option");
-        options.forEach(opt => {
-            opt.classList.remove("selected");
-            if (parseInt(opt.getAttribute("data-idx")) === idx) {
-                opt.classList.add("selected");
-            }
-        });
-        setTimeout(() => {
-            window.location.href = "ankidroid://show-answer";
-        }, 200);
-    };
-
-    globalThis.ankidroid.mcShuffle = function () {
-        const container = document.getElementById("mc-options");
-        if (!container) return;
-        const options = Array.from(container.querySelectorAll(".mc-option"));
-        for (let i = options.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            container.insertBefore(options[j], options[i]);
-            container.insertBefore(options[i], options[j].nextSibling || null);
-            [options[i], options[j]] = [options[j], options[i]];
-        }
-    };
-
-    const origShowQuestion = globalThis._showQuestion;
-    if (typeof origShowQuestion === "function") {
-        globalThis._showQuestion = function (q, a, b) {
-            origShowQuestion(q, a, b);
-            if (document.getElementById("mc-options")) {
-                globalThis.ankidroid.mcShuffle();
-            }
-        };
-    }
-})();
-
-// ============================================================================
 // Input focus listeners
 // ============================================================================
 

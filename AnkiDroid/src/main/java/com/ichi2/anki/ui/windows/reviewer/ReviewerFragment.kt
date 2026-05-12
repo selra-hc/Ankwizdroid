@@ -696,6 +696,8 @@ class ReviewerFragment :
                 "ankidroid" -> {
                     when (url.host) {
                         "show-answer" -> viewModel.onShowAnswer()
+                        "mc-select" -> url.lastPathSegment?.let { viewModel.onMultipleChoiceSelected(it) }
+                        else -> {}
                     }
                     true
                 }

@@ -22,12 +22,15 @@ import anki.frontend.SetSchedulingStatesRequest
 import anki.scheduler.CardAnswer.Rating
 import com.ichi2.anki.AbstractFlashcardViewer
 import com.ichi2.anki.AbstractFlashcardViewer.Companion.RESULT_NO_MORE_CARDS
+import com.ichi2.anki.AnkiDroidApp
 import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.CollectionManager.withCol
 import com.ichi2.anki.Flag
+import com.ichi2.anki.R
 import com.ichi2.anki.Reviewer
 import com.ichi2.anki.asyncIO
 import com.ichi2.anki.browser.BrowserDestination
+import com.ichi2.anki.cardviewer.MultipleChoiceFeedback
 import com.ichi2.anki.cardviewer.SingleCardSide
 import com.ichi2.anki.common.annotations.NeedsTest
 import com.ichi2.anki.launchCatchingIO
@@ -135,6 +138,16 @@ class ReviewerViewModel(
     val answerTimer = AnswerTimer()
     private val actionsMutex = Mutex()
 
+    private val mcFeedbackStrings by lazy {
+        MultipleChoiceFeedback.Strings(
+            right = AnkiDroidApp.instance.getString(R.string.mc_feedback_right),
+            wrong = AnkiDroidApp.instance.getString(R.string.mc_feedback_wrong),
+            noAnswer = AnkiDroidApp.instance.getString(R.string.mc_feedback_no_answer),
+            correctAnswerLabel = AnkiDroidApp.instance.getString(R.string.mc_feedback_correct_answer_label),
+            yourAnswerLabel = AnkiDroidApp.instance.getString(R.string.mc_feedback_your_answer_label),
+        )
+    }
+
     /**
      * A flag that determines if the SchedulingStates in CurrentQueueState are
      * safe to persist in the database when answering a card. This is used to
@@ -188,6 +201,13 @@ class ReviewerViewModel(
 
     fun onShowAnswer() {
         executeAction(ViewerAction.SHOW_ANSWER)
+    }
+
+    fun onMultipleChoiceSelected(letter: String) {
+        val upper = letter.uppercase()
+        if (upper !in setOf("A", "B", "C", "D")) return
+        savedStateHandle[KEY_MC_SELECTED_LETTER] = upper
+        onShowAnswer()
     }
 
     fun answerCard(rating: Rating) {
@@ -461,8 +481,15 @@ class ReviewerViewModel(
         }
     }
 
+    override suspend fun prepareAnswerHtml(html: String): String {
+        val letter = savedStateHandle.get<String>(KEY_MC_SELECTED_LETTER)
+        val card = currentCard.await()
+        return withCol { MultipleChoiceFeedback.injectForCard(this, card, html, letter, mcFeedbackStrings) }
+    }
+
     override suspend fun showQuestion() {
         Timber.v("ReviewerViewModel::showQuestion")
+        savedStateHandle.remove<String>(KEY_MC_SELECTED_LETTER)
         super.showQuestion()
         runStateMutationHook()
         updateMarkIcon()
@@ -831,5 +858,6 @@ class ReviewerViewModel(
     companion object {
         private const val KEY_PREVIOUS_CARD_ID = "key_previous_card_id"
         private const val KEY_COUNTS = "counts"
+        private const val KEY_MC_SELECTED_LETTER = "mcSelectedLetter"
     }
 }

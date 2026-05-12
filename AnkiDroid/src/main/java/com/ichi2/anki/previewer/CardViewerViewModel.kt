@@ -124,6 +124,8 @@ abstract class CardViewerViewModel(
             renderOutput = currentCard.await().let { card -> withCol { card.renderOutput(this) } },
         )
 
+    protected open suspend fun prepareAnswerHtml(html: String): String = html
+
     protected open suspend fun showQuestion() {
         Timber.v("showQuestion")
         showingAnswer.emit(false)
@@ -152,7 +154,7 @@ abstract class CardViewerViewModel(
 
         val card = currentCard.await()
         val answerData = withCol { card.answer(this) }
-        val answer = mungeQA(answerData)
+        val answer = prepareAnswerHtml(mungeQA(answerData))
 
         eval.emit("_showAnswer(${Json.encodeToString(answer)}, '${bodyClass()}');")
     }
