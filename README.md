@@ -1,4 +1,4 @@
-<p>AnkwizDroid is a fork of AnkiDroid, designed to accolmodate 4-choinces quizz with right answer and explanations.</p>
+<p>AnkwizDroid is a fork of AnkiDroid, designed to accomodate 4-choices quizz with right answer and explanations.</p>
 <p>I made it as I wanted the questions to be random, and have the ability to show questions were I was wrong more often than the one I got right, which is an AnkiDroid native functionality</p>
 <p>Below, the original AnkiDroid page</p>
 <p align="center">
