@@ -35,9 +35,9 @@ data class McAnswer(
 object MultipleChoiceFeedback {
     const val FEEDBACK_PLACEHOLDER: String = """<div id="mc-feedback"></div>"""
 
-    private val mcOptionOpenRegex = Regex("""<div class="mc-option"([^>]*)>""", RegexOption.IGNORE_CASE)
+    private val mcOptionOpenRegex = Regex("""<a\s+class="mc-option"([^>]*)>""", RegexOption.IGNORE_CASE)
     private val mcOptionDataIdxRegex = Regex("""data-idx="([A-Da-d])"""")
-    private val mcOptionOnclickRegex = Regex("""\s*onclick="[^"]*"""")
+    private val mcOptionHrefRegex = Regex("""\s*href="ankidroid://mc-select/[^"]*"""")
 
     data class Strings(
         val right: String,
@@ -103,7 +103,7 @@ object MultipleChoiceFeedback {
     ): String = html.replace(FEEDBACK_PLACEHOLDER, """<div id="mc-feedback">$feedbackInnerHtml</div>""")
 
     /**
-     * Strips [onclick] from each `.mc-option` row (so the answer side cannot re-fire mc-select) and
+     * Strips [href] from each `.mc-option` row (so the answer side cannot re-fire mc-select) and
      * adds highlight classes: correct key, and optional selected-right / selected-wrong for the
      * tapped letter when [selectedLetter] is non-null.
      *
@@ -126,7 +126,7 @@ object MultipleChoiceFeedback {
                     ?.get(1)
                     ?.uppercase()
                     ?: return@replace match.value
-            val withoutOnclick = mcOptionOnclickRegex.replace(attrBlock, "")
+            val withoutHref = mcOptionHrefRegex.replace(attrBlock, "")
             val extras =
                 buildList {
                     if (letter == corr) add("mc-option-correct")
@@ -134,7 +134,7 @@ object MultipleChoiceFeedback {
                         add(if (sel == corr) "mc-option-selected-right" else "mc-option-selected-wrong")
                     }
                 }
-            val stripped = withoutOnclick.trim()
+            val stripped = withoutHref.trim()
             val classValue =
                 buildString {
                     append("mc-option")
@@ -143,7 +143,7 @@ object MultipleChoiceFeedback {
                     }
                 }
             val spacer = if (stripped.isEmpty()) "" else " "
-            """<div class="$classValue"$spacer$stripped>"""
+            """<a class="$classValue"$spacer$stripped>"""
         }
     }
 

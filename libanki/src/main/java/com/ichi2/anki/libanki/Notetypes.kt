@@ -256,22 +256,22 @@ class Notetypes(
             "<span class=\"mc-qnum\">{{QuestionNumber}}</span> | " +
             "<span class=\"mc-question\">{{Question}}</span></div>\n" +
             "<div id=\"mc-options\">\n" +
-            "<div class=\"mc-option\" data-idx=\"A\" " +
-            "onclick=\"window.location.href='ankidroid://mc-select/A'\">{{AnswerA}}</div>\n" +
-            "<div class=\"mc-option\" data-idx=\"B\" " +
-            "onclick=\"window.location.href='ankidroid://mc-select/B'\">{{AnswerB}}</div>\n" +
-            "<div class=\"mc-option\" data-idx=\"C\" " +
-            "onclick=\"window.location.href='ankidroid://mc-select/C'\">{{AnswerC}}</div>\n" +
-            "<div class=\"mc-option\" data-idx=\"D\" " +
-            "onclick=\"window.location.href='ankidroid://mc-select/D'\">{{AnswerD}}</div>\n" +
+            "<a class=\"mc-option\" data-idx=\"A\" " +
+            "href=\"ankidroid://mc-select/A\">{{AnswerA}}</a>\n" +
+            "<a class=\"mc-option\" data-idx=\"B\" " +
+            "href=\"ankidroid://mc-select/B\">{{AnswerB}}</a>\n" +
+            "<a class=\"mc-option\" data-idx=\"C\" " +
+            "href=\"ankidroid://mc-select/C\">{{AnswerC}}</a>\n" +
+            "<a class=\"mc-option\" data-idx=\"D\" " +
+            "href=\"ankidroid://mc-select/D\">{{AnswerD}}</a>\n" +
             "</div>\n"
 
         template.afmt = "{{FrontSide}}\n<hr id=\"answer\">\n<div id=\"mc-feedback\"></div>"
 
         nt.css =
             ".mc-question { font-size: 1.2em; margin-bottom: 16px; font-weight: bold; }\n" +
-            ".mc-option { padding: 12px 16px; margin: 6px 0; border: 2px solid #ccc; " +
-            "border-radius: 8px; background: #f9f9f9; cursor: pointer; " +
+            ".mc-option { display: block; text-decoration: none; color: inherit; " +
+            "padding: 12px 16px; margin: 6px 0; border: 2px solid #ccc; border-radius: 8px; background: #f9f9f9; cursor: pointer; " +
             "transition: background 0.2s, border-color 0.2s; }\n" +
             ".mc-option:hover { background: #e8e8e8; border-color: #999; }\n" +
             ".mc-option-correct { border-color: #2e7d32; background: #e8f5e9; }\n" +
@@ -286,7 +286,27 @@ class Notetypes(
             ".mc-your-answer { background: #ffebee; border-left: 4px solid #c62828; " +
             "padding: 8px 12px; margin: 8px 0; border-radius: 4px; }\n" +
             ".mc-just-correct { margin-top: 4px; font-style: italic; color: #388e3c; }\n" +
-            ".mc-just-wrong { margin-top: 4px; font-style: italic; color: #d32f2f; }"
+            ".mc-just-wrong { margin-top: 4px; font-style: italic; color: #d32f2f; }\n" +
+            ".night_mode .mc-option { background: #1e1e1e !important; border-color: #555 !important; }\n" +
+            ".night_mode .mc-option:hover { background: #2e2e2e !important; border-color: #777 !important; }\n" +
+            ".night_mode .mc-option-correct { background: #1b3a1b !important; border-color: #4caf50 !important; }\n" +
+            ".night_mode .mc-option-selected-right { background: #2e5a2e !important; border-color: #4caf50 !important; }\n" +
+            ".night_mode .mc-option-selected-wrong { background: #3a1b1b !important; border-color: #ef5350 !important; }\n" +
+            ".night_mode .mc-option-tapped { background: #333 !important; border-color: #888 !important; }\n" +
+            ".night_mode .mc-correct-answer { background: #1b3a1b !important; border-left-color: #4caf50 !important; }\n" +
+            ".night_mode .mc-your-answer { background: #3a1b1b !important; border-left-color: #ef5350 !important; }\n" +
+            ".night_mode .mc-correct { color: #81c784 !important; }\n" +
+            ".night_mode .mc-wrong { color: #ef9a9a !important; }\n" +
+            ".night_mode .mc-just-correct { color: #81c784 !important; }\n" +
+            ".night_mode .mc-just-wrong { color: #ef9a9a !important; }\n" +
+            ".ankidroid_dark_mode .mc-option { background: #383838 !important; border-color: #555 !important; }\n" +
+            ".ankidroid_dark_mode .mc-option:hover { background: #484848 !important; border-color: #777 !important; }\n" +
+            ".ankidroid_dark_mode .mc-option-correct { background: #1e3e1e !important; border-color: #4caf50 !important; }\n" +
+            ".ankidroid_dark_mode .mc-option-selected-right { background: #2e5a2e !important; border-color: #4caf50 !important; }\n" +
+            ".ankidroid_dark_mode .mc-option-selected-wrong { background: #3e1e1e !important; border-color: #ef5350 !important; }\n" +
+            ".ankidroid_dark_mode .mc-option-tapped { background: #484848 !important; border-color: #888 !important; }\n" +
+            ".ankidroid_dark_mode .mc-correct-answer { background: #1e3e1e !important; border-left-color: #4caf50 !important; }\n" +
+            ".ankidroid_dark_mode .mc-your-answer { background: #3e1e1e !important; border-left-color: #ef5350 !important; }"
 
         add_template(nt, template)
         return nt

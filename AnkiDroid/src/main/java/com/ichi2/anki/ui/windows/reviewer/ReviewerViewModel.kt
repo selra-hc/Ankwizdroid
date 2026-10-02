@@ -78,10 +78,12 @@ import com.ichi2.anki.utils.ext.previousCardStudy
 import com.ichi2.anki.utils.ext.setUserFlagForCards
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.intellij.lang.annotations.Language
 import timber.log.Timber
@@ -474,6 +476,13 @@ class ReviewerViewModel(
                 isInputFocused = false
                 return byteArrayOf()
             }
+            "mc-select" -> {
+                val letter = String(bytes, Charsets.UTF_8).uppercase()
+                if (letter in setOf("A", "B", "C", "D")) {
+                    withContext(Dispatchers.Main) { onMultipleChoiceSelected(letter) }
+                }
+                return byteArrayOf()
+            }
         }
         return when (uri.backendMethodName) {
             "getSchedulingStatesWithContext" -> getSchedulingStatesWithContext()
@@ -492,12 +501,39 @@ class ReviewerViewModel(
         Timber.v("ReviewerViewModel::showQuestion")
         savedStateHandle.remove<String>(KEY_MC_SELECTED_LETTER)
         super.showQuestion()
+        injectMcOptionClickHandlers()
         runStateMutationHook()
         updateMarkIcon()
         updateFlagIcon()
         if (!autoAdvance.shouldWaitForAudio()) {
             autoAdvance.onShowQuestion()
         } // else run in onMediaGroupCompleted
+    }
+
+    private suspend fun injectMcOptionClickHandlers() {
+        val js = """
+        (function() {
+            var container = document.getElementById('mc-options');
+            if (!container) return;
+            var opts = container.querySelectorAll('.mc-option');
+            opts.forEach(function(opt) {
+                opt.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var idx = opt.getAttribute('data-idx');
+                    if (!idx) return;
+                    opts.forEach(function(o) { o.classList.remove('mc-option-tapped'); });
+                    opt.classList.add('mc-option-tapped');
+                    fetch('/ankidroid/mc-select', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: idx
+                    });
+                });
+            });
+        })();
+        """
+        eval.emit(js)
     }
 
     private suspend fun runStateMutationHook() {

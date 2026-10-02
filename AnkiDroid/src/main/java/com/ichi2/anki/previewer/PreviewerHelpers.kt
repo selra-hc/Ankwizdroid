@@ -26,6 +26,7 @@ import com.ichi2.anki.LanguageUtils
 import com.ichi2.anki.libanki.CardOrdinal
 import com.ichi2.anki.settings.Prefs
 import com.ichi2.anki.settings.enums.FrameStyle
+import com.ichi2.anki.settings.enums.NightTheme
 import com.ichi2.themes.Themes
 import com.ichi2.utils.toRGBHex
 import org.intellij.lang.annotations.Language
@@ -78,6 +79,26 @@ fun stdHtml(
             <style>
                 .night-mode button { --canvas: #606060; --fg: #eee; }
                 $colors
+                .night_mode .mc-option { background: #1e1e1e !important; border-color: #555 !important; }
+                .night_mode .mc-option:hover { background: #2e2e2e !important; border-color: #777 !important; }
+                .night_mode .mc-option-correct { background: #1b3a1b !important; border-color: #4caf50 !important; }
+                .night_mode .mc-option-selected-right { background: #2e5a2e !important; border-color: #4caf50 !important; }
+                .night_mode .mc-option-selected-wrong { background: #3a1b1b !important; border-color: #ef5350 !important; }
+                .night_mode .mc-option-tapped { background: #333 !important; border-color: #888 !important; }
+                .night_mode .mc-correct-answer { background: #1b3a1b !important; border-left-color: #4caf50 !important; }
+                .night_mode .mc-your-answer { background: #3a1b1b !important; border-left-color: #ef5350 !important; }
+                .night_mode .mc-correct { color: #81c784 !important; }
+                .night_mode .mc-wrong { color: #ef9a9a !important; }
+                .night_mode .mc-just-correct { color: #81c784 !important; }
+                .night_mode .mc-just-wrong { color: #ef9a9a !important; }
+                .ankidroid_dark_mode .mc-option { background: #383838 !important; border-color: #555 !important; }
+                .ankidroid_dark_mode .mc-option:hover { background: #484848 !important; border-color: #777 !important; }
+                .ankidroid_dark_mode .mc-option-correct { background: #1e3e1e !important; border-color: #4caf50 !important; }
+                .ankidroid_dark_mode .mc-option-selected-right { background: #2e5a2e !important; border-color: #4caf50 !important; }
+                .ankidroid_dark_mode .mc-option-selected-wrong { background: #3e1e1e !important; border-color: #ef5350 !important; }
+                .ankidroid_dark_mode .mc-option-tapped { background: #484848 !important; border-color: #888 !important; }
+                .ankidroid_dark_mode .mc-correct-answer { background: #1e3e1e !important; border-left-color: #4caf50 !important; }
+                .ankidroid_dark_mode .mc-your-answer { background: #3e1e1e !important; border-left-color: #ef5350 !important; }
             </style>
         </head>
         <body class="${bodyClass()}">
@@ -98,7 +119,14 @@ fun bodyClassForCardOrd(
     nightMode: Boolean = Themes.isNightTheme,
 ): String = "card card${cardOrd + 1} ${bodyClass(nightMode)} mathjax-rendered"
 
-private fun bodyClass(nightMode: Boolean = Themes.isNightTheme): String = if (nightMode) "nightMode night_mode" else ""
+private fun bodyClass(nightMode: Boolean = Themes.isNightTheme): String {
+    if (!nightMode) return ""
+    val classes = StringBuilder("nightMode night_mode")
+    if (Themes.currentTheme == NightTheme.DARK) {
+        classes.append(" ankidroid_dark_mode")
+    }
+    return classes.toString()
+}
 
 fun MaterialCardView.setFrameStyle() {
     if (Prefs.frameStyle == FrameStyle.BOX && Prefs.isNewStudyScreenEnabled) {

@@ -154,3 +154,101 @@ scale up, but not down.  */
 .night_mode .replay-button svg {
   fill: white;
 }
+
+/* Multiple choice night mode overrides */
+.night_mode .mc-option {
+  background: #1e1e1e !important;
+  border-color: #555 !important;
+}
+
+.night_mode .mc-option:hover {
+  background: #2e2e2e !important;
+  border-color: #777 !important;
+}
+
+.night_mode .mc-option-correct {
+  background: #1b3a1b !important;
+  border-color: #4caf50 !important;
+}
+
+.night_mode .mc-option-selected-right {
+  background: #2e5a2e !important;
+  border-color: #4caf50 !important;
+}
+
+.night_mode .mc-option-selected-wrong {
+  background: #3a1b1b !important;
+  border-color: #ef5350 !important;
+}
+
+.night_mode .mc-option-tapped {
+  background: #333 !important;
+  border-color: #888 !important;
+}
+
+.night_mode .mc-correct-answer {
+  background: #1b3a1b !important;
+  border-left-color: #4caf50 !important;
+}
+
+.night_mode .mc-your-answer {
+  background: #3a1b1b !important;
+  border-left-color: #ef5350 !important;
+}
+
+.night_mode .mc-correct {
+  color: #81c784 !important;
+}
+
+.night_mode .mc-wrong {
+  color: #ef9a9a !important;
+}
+
+.night_mode .mc-just-correct {
+  color: #81c784 !important;
+}
+
+.night_mode .mc-just-wrong {
+  color: #ef9a9a !important;
+}
+
+/* Multiple choice dark (non-black) mode overrides */
+.ankidroid_dark_mode .mc-option {
+  background: #383838 !important;
+  border-color: #555 !important;
+}
+
+.ankidroid_dark_mode .mc-option:hover {
+  background: #484848 !important;
+  border-color: #777 !important;
+}
+
+.ankidroid_dark_mode .mc-option-correct {
+  background: #1e3e1e !important;
+  border-color: #4caf50 !important;
+}
+
+.ankidroid_dark_mode .mc-option-selected-right {
+  background: #2e5a2e !important;
+  border-color: #4caf50 !important;
+}
+
+.ankidroid_dark_mode .mc-option-selected-wrong {
+  background: #3e1e1e !important;
+  border-color: #ef5350 !important;
+}
+
+.ankidroid_dark_mode .mc-option-tapped {
+  background: #484848 !important;
+  border-color: #888 !important;
+}
+
+.ankidroid_dark_mode .mc-correct-answer {
+  background: #1e3e1e !important;
+  border-left-color: #4caf50 !important;
+}
+
+.ankidroid_dark_mode .mc-your-answer {
+  background: #3e1e1e !important;
+  border-left-color: #ef5350 !important;
+}
